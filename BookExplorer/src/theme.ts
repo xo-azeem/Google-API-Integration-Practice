@@ -1,4 +1,3 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 import { useColorScheme } from 'react-native';
 
@@ -56,62 +55,26 @@ const darkThemeColors = {
   onSurfaceVariant: '#C4C6D0',
 };
 
-// Create light and dark themes
-const lightTheme = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    ...lightThemeColors,
-  },
-  roundness: 8,
-};
-
-const darkTheme = {
-  ...MD3DarkTheme,
-  colors: {
-    ...MD3DarkTheme.colors,
-    ...darkThemeColors,
-  },
-  roundness: 8,
-};
-
-// Create context for theme management
-export const ThemeContext = createContext({
-  isDarkMode: false,
-  toggleTheme: () => {},
-  theme: lightTheme,
-});
-
-// Theme provider component
-export const ThemeProvider = ({ children }) => {
-  const systemColorScheme = useColorScheme();
-  const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === 'dark');
-
-  // Update theme based on system changes
-  useEffect(() => {
-    setIsDarkMode(systemColorScheme === 'dark');
-  }, [systemColorScheme]);
-
-  // Toggle theme function
-  const toggleTheme = () => {
-    setIsDarkMode(prevMode => !prevMode);
+export const useAppTheme = () => {
+  const colorScheme = useColorScheme();
+  
+  const lightTheme = {
+    ...MD3LightTheme,
+    colors: {
+      ...MD3LightTheme.colors,
+      ...lightThemeColors,
+    },
+    roundness: 8,
   };
 
-  // Get current theme based on mode
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const darkTheme = {
+    ...MD3DarkTheme,
+    colors: {
+      ...MD3DarkTheme.colors,
+      ...darkThemeColors,
+    },
+    roundness: 8,
+  };
 
-  return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme, theme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-// Custom hook to use theme
-export const useAppTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useAppTheme must be used within a ThemeProvider');
-  }
-  return context;
+  return colorScheme === 'dark' ? darkTheme : lightTheme;
 };

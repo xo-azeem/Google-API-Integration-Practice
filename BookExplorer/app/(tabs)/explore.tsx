@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
-import { TextInput, Button, Appbar, Text, ActivityIndicator, Chip, Divider } from 'react-native-paper';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ScrollView, View, StyleSheet, useColorScheme } from 'react-native';
+import { TextInput, Button, Appbar, Text, ActivityIndicator, Chip, useTheme, Divider } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchBooks } from '../../services/api';
 import { sendPushNotification, registerForPushNotificationsAsync } from '../../services/notification';
-import { useAppTheme } from '../../src/theme';
 
-// BookCard component with bookmark functionality
+// Dummy BookCard component with improved styling and bookmark icon
 const BookCard = ({ book }) => {
   const [bookmarked, setBookmarked] = useState(false);
-  const { theme } = useAppTheme();
+  const theme = useTheme();
   
   const toggleBookmark = () => {
     setBookmarked(!bookmarked);
@@ -51,11 +50,23 @@ export default function ExploreScreen() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
-  const { theme, isDarkMode, toggleTheme } = useAppTheme();
+  const theme = useTheme();
+  const systemColorScheme = useColorScheme();
+  const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === 'dark');
+  
+  // Force app re-render when theme changes
+  const forceUpdate = useCallback(() => {}, []);
 
   useEffect(() => {
     registerForPushNotificationsAsync();
   }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    // This is just a placeholder since we can't directly change the system theme
+    // In a real app, you would use a theme context to manage this
+    forceUpdate();
+  };
 
   const handleSearch = async () => {
     if (!query.trim()) return;
