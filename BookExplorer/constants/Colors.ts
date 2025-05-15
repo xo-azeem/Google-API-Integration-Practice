@@ -3,24 +3,22 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+/**
+ * Colors used in the app for light theme only.
+ */
+
+const tintColor = '#4285F4'; // Google blue
 
 export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+  text: '#202124',           // Dark gray for text
+  background: '#FFFFFF',     // Pure white background
+  tint: tintColor,           // Google blue tint
+  icon: '#5F6368',           // Subtle gray for icons
+  tabIconDefault: '#9AA0A6', // Light gray for inactive icons
+  tabIconSelected: tintColor, // Google blue for selected icons
+  surface: '#FFFFFF',        // White surface
+  border: '#DADCE0',         // Light gray border
+  notification: '#EA4335',   // Google red for notifications
+  secondary: '#34A853',      // Google green
+  tertiary: '#FBBC04',       // Google yellow
 };

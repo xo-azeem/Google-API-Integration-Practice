@@ -1,80 +1,76 @@
-import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
-import { useColorScheme } from 'react-native';
+import { MD3LightTheme } from 'react-native-paper';
 
-// Light theme colors
+// Enhanced light theme colors - more pleasing to the eye
 const lightThemeColors = {
-  primary: '#2E5A88',       
+  primary: '#4285F4',         // Google blue - pleasing and familiar
   onPrimary: '#FFFFFF',
-  primaryContainer: '#D6E3FF',
-  onPrimaryContainer: '#001A42',
-  secondary: '#535F70',
+  primaryContainer: '#E8F0FE', // Lighter blue container
+  onPrimaryContainer: '#0D2C76',
+  secondary: '#34A853',       // Google green
   onSecondary: '#FFFFFF',
-  secondaryContainer: '#D6E3F7',
-  onSecondaryContainer: '#101C2B',
-  tertiary: '#6E5676',
+  secondaryContainer: '#E6F4EA', // Light green container
+  onSecondaryContainer: '#0D5F2D',
+  tertiary: '#EA4335',        // Google red for accent
   onTertiary: '#FFFFFF',
-  tertiaryContainer: '#F5D9FF',
-  onTertiaryContainer: '#251431',
-  error: '#BA1A1A',
+  tertiaryContainer: '#FCEAE9', // Light red container
+  onTertiaryContainer: '#7E1E15',
+  error: '#EA4335',           // Google red for error
   onError: '#FFFFFF',
-  errorContainer: '#FFDAD6',
-  onErrorContainer: '#410002',
-  background: '#F8FAFF',
-  onBackground: '#1A1C1E',
-  surface: '#FDFCFF',
-  onSurface: '#1A1C1E',
-  outline: '#73777F',
-  surfaceVariant: '#E0E2EC',
-  onSurfaceVariant: '#43474E',
-};
-
-// Dark theme colors
-const darkThemeColors = {
-  primary: '#ADC7FF',      
-  onPrimary: '#002E6A',
-  primaryContainer: '#19427B',
-  onPrimaryContainer: '#D6E3FF',
-  secondary: '#B9C8DA',
-  onSecondary: '#253141',
-  secondaryContainer: '#3C4858',
-  onSecondaryContainer: '#D6E3F7',
-  tertiary: '#D9BDE1',
-  onTertiary: '#3C2947',
-  tertiaryContainer: '#543E5C',
-  onTertiaryContainer: '#F5D9FF',
-  error: '#FFB4AB',
-  onError: '#690005',
-  errorContainer: '#93000A',
-  onErrorContainer: '#FFDAD6',
-  background: '#1A1C1E',
-  onBackground: '#E3E2E6',
-  surface: '#121315',
-  onSurface: '#E3E2E6',
-  outline: '#8C9198',
-  surfaceVariant: '#43474E',
-  onSurfaceVariant: '#C4C6D0',
+  errorContainer: '#FCEAE9',
+  onErrorContainer: '#7E1E15',
+  background: '#FFFFFF',      // Pure white background
+  onBackground: '#202124',    // Dark gray for text
+  surface: '#FFFFFF',         // Pure white for surfaces
+  onSurface: '#202124',       // Dark gray for text on surfaces
+  outline: '#DADCE0',         // Light gray outline
+  surfaceVariant: '#F8F9FA',  // Very light gray surface variant
+  onSurfaceVariant: '#5F6368', // Medium gray for secondary text
+  elevation: {
+    level0: 'transparent',
+    level1: '#FFFFFF',        // Pure white
+    level2: '#F8F9FA',        // Very light gray
+    level3: '#F1F3F4',        // Light gray
+    level4: '#ECEFF1',        // Slightly darker light gray
+    level5: '#E8EAED',        // Medium light gray
+  },
 };
 
 export const useAppTheme = () => {
-  const colorScheme = useColorScheme();
-  
-  const lightTheme = {
+  // Always return light theme because dark mode is not supported as there is no dark mode in the app
+  // and the app is designed to be light-themed.
+  return {
     ...MD3LightTheme,
     colors: {
       ...MD3LightTheme.colors,
       ...lightThemeColors,
     },
-    roundness: 8,
-  };
-
-  const darkTheme = {
-    ...MD3DarkTheme,
-    colors: {
-      ...MD3DarkTheme.colors,
-      ...darkThemeColors,
+    roundness: 14, // Increased roundness for softer UI
+    animation: {
+      scale: 1.0,
     },
-    roundness: 8,
+    fonts: {
+      ...MD3LightTheme.fonts,
+      // Enhance typography
+      bodyLarge: { 
+        ...MD3LightTheme.fonts.bodyLarge, 
+        fontWeight: '400',
+        letterSpacing: 0.15,
+      },
+      bodyMedium: { 
+        ...MD3LightTheme.fonts.bodyMedium,
+        fontWeight: '400',
+        letterSpacing: 0.25,
+      },
+      titleLarge: {
+        ...MD3LightTheme.fonts.titleLarge,
+        fontWeight: '500',
+        letterSpacing: 0,
+      },
+      titleMedium: {
+        ...MD3LightTheme.fonts.titleMedium,
+        fontWeight: '500',
+        letterSpacing: 0.15,
+      },
+    },
   };
-
-  return colorScheme === 'dark' ? darkTheme : lightTheme;
 };

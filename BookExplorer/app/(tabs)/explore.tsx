@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, View, StyleSheet, useColorScheme } from 'react-native';
-import { TextInput, Button, Appbar, Text, ActivityIndicator, Chip, useTheme, Divider } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Appbar, Button, Chip, Divider, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../../constants/Colors';
 import { fetchBooks } from '../../services/api';
-import { sendPushNotification, registerForPushNotificationsAsync } from '../../services/notification';
+import { registerForPushNotificationsAsync, sendPushNotification } from '../../services/notification';
 
-// Dummy BookCard component with improved styling and bookmark icon
+// Improved BookCard component with MaterialCommunityIcons
 const BookCard = ({ book }) => {
   const [bookmarked, setBookmarked] = useState(false);
-  const theme = useTheme();
   
   const toggleBookmark = () => {
     setBookmarked(!bookmarked);
   };
   
   return (
-    <View style={[styles.bookCard, { backgroundColor: theme.colors.surfaceVariant }]}>
+    <View style={[styles.bookCard, { backgroundColor: Colors.surface, borderColor: Colors.border }]}>
       <View style={styles.bookCardHeader}>
         <View style={styles.bookCardTitleContainer}>
           <Text variant="titleMedium" style={styles.bookCardTitle} numberOfLines={2}>
@@ -27,7 +27,13 @@ const BookCard = ({ book }) => {
           </Text>
         </View>
         <Button
-          icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
+          icon={({size, color}) => (
+            <MaterialCommunityIcons 
+              name={bookmarked ? 'bookmark' : 'bookmark-outline'} 
+              size={size} 
+              color={bookmarked ? Colors.tint : color} 
+            />
+          )}
           mode="text"
           onPress={toggleBookmark}
           contentStyle={styles.bookmarkButton}
@@ -38,8 +44,25 @@ const BookCard = ({ book }) => {
         {book.description || 'No description available.'}
       </Text>
       <View style={styles.bookCardActions}>
-        <Button mode="outlined" style={styles.bookCardButton}>Details</Button>
-        <Button mode="contained" style={styles.bookCardButton}>Preview</Button>
+        <Button 
+          mode="outlined" 
+          style={styles.bookCardButton}
+          icon={({size, color}) => (
+            <MaterialCommunityIcons name="information-outline" size={size} color={color} />
+          )}
+        >
+          Details
+        </Button>
+        <Button 
+          mode="contained" 
+          style={styles.bookCardButton}
+          buttonColor={Colors.tint}
+          icon={({size, color}) => (
+            <MaterialCommunityIcons name="eye-outline" size={size} color={color} />
+          )}
+        >
+          Preview
+        </Button>
       </View>
     </View>
   );
@@ -51,22 +74,10 @@ export default function ExploreScreen() {
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
   const theme = useTheme();
-  const systemColorScheme = useColorScheme();
-  const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === 'dark');
-  
-  // Force app re-render when theme changes
-  const forceUpdate = useCallback(() => {}, []);
 
   useEffect(() => {
     registerForPushNotificationsAsync();
   }, []);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    // This is just a placeholder since we can't directly change the system theme
-    // In a real app, you would use a theme context to manage this
-    forceUpdate();
-  };
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -98,13 +109,11 @@ export default function ExploreScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <Appbar.Header style={styles.header}>
-        <Appbar.Content title="Book Explorer" titleStyle={styles.headerTitle} />
-        <Appbar.Action 
-          icon={isDarkMode ? 'white-balance-sunny' : 'moon-waning-crescent'} 
-          onPress={toggleTheme} 
-          color={theme.colors.onSurface}
+    <SafeAreaView style={[styles.container, { backgroundColor: Colors.background }]} edges={['top']}>
+      <Appbar.Header style={[styles.header, { backgroundColor: Colors.background }]}>
+        <Appbar.Content 
+          title="Book Explorer" 
+          titleStyle={[styles.headerTitle, { color: Colors.tint }]} 
         />
       </Appbar.Header>
 
@@ -118,32 +127,59 @@ export default function ExploreScreen() {
             value={query}
             onChangeText={setQuery}
             mode="outlined"
-            left={<TextInput.Icon icon="magnify" />}
-            right={query ? <TextInput.Icon icon="close" onPress={() => setQuery('')} /> : null}
+            left={
+              <TextInput.Icon 
+                icon={({size, color}) => (
+                  <MaterialCommunityIcons name="book-search" size={size} color={Colors.tint} />
+                )} 
+              />
+            }
+            right={
+              query ? 
+              <TextInput.Icon 
+                icon={({size}) => (
+                  <MaterialCommunityIcons name="close" size={size} color={Colors.icon} />
+                )} 
+                onPress={() => setQuery('')} 
+              /> 
+              : null
+            }
             style={styles.searchInput}
+            outlineStyle={styles.searchInputOutline}
             returnKeyType="search"
             onSubmitEditing={handleSearch}
             autoCapitalize="none"
+            theme={{ colors: { onSurfaceVariant: Colors.icon } }}
           />
           <Button 
             mode="contained" 
             onPress={handleSearch} 
             style={styles.searchButton}
+            buttonColor={Colors.tint}
+            textColor="#fff"
             disabled={loading || !query.trim()}
+            icon={({size, color}) => (
+              <MaterialCommunityIcons name="magnify" size={size} color={color} />
+            )}
           >
             {loading ? 'Searching...' : 'Search'}
           </Button>
 
           {recentSearches.length > 0 && !books.length && (
             <View style={styles.recentSearchesContainer}>
-              <Text variant="labelMedium" style={styles.recentSearchesTitle}>Recent Searches</Text>
+              <Text variant="labelMedium" style={[styles.recentSearchesTitle, { color: Colors.text }]}>
+                Recent Searches
+              </Text>
               <View style={styles.chipContainer}>
                 {recentSearches.map((term, idx) => (
                   <Chip 
                     key={idx} 
-                    icon="history" 
+                    icon={({size, color}) => (
+                      <MaterialCommunityIcons name="history" size={size} color={color} />
+                    )}
                     onPress={() => handleRecentSearch(term)}
                     style={styles.recentSearchChip}
+                    textStyle={{ color: Colors.tint }}
                   >
                     {term}
                   </Chip>
@@ -155,14 +191,16 @@ export default function ExploreScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text style={styles.loadingText}>Searching for books...</Text>
+            <ActivityIndicator size="large" color={Colors.tint} />
+            <Text style={[styles.loadingText, { color: Colors.text }]}>
+              Searching for books...
+            </Text>
           </View>
         ) : (
           <>
             {books.length > 0 && (
               <View style={styles.resultsContainer}>
-                <Text variant="titleMedium" style={styles.resultsTitle}>
+                <Text variant="titleMedium" style={[styles.resultsTitle, { color: Colors.text }]}>
                   {books.length} results for "{query}"
                 </Text>
                 <Divider style={styles.divider} />
@@ -175,37 +213,25 @@ export default function ExploreScreen() {
             
             {!loading && books.length === 0 && query.trim() && (
               <View style={styles.emptyContainer}>
-                <Ionicons name="book-outline" size={64} color={theme.colors.outline} />
-                <Text variant="titleMedium" style={styles.emptyTitle}>No books found</Text>
-                <Text variant="bodyMedium" style={styles.emptySubtitle}>
+                <MaterialCommunityIcons name="book-alert" size={64} color={Colors.icon} />
+                <Text variant="titleMedium" style={[styles.emptyTitle, { color: Colors.text }]}>
+                  No books found
+                </Text>
+                <Text variant="bodyMedium" style={[styles.emptySubtitle, { color: Colors.icon }]}>
                   Try another search term or check your spelling
                 </Text>
               </View>
             )}
             
             {!query.trim() && !books.length && (
-              <View style={styles.welcomeContainer}>
-                <Ionicons name="library-outline" size={80} color={theme.colors.primary} />
-                <Text variant="headlineSmall" style={styles.welcomeTitle}>Welcome to Book Explorer</Text>
-                <Text variant="bodyMedium" style={styles.welcomeText}>
-                  Search for books by title, author, or keywords to explore the world of literature.
+              <View style={styles.hintContainer}>
+                <MaterialCommunityIcons name="book-search" size={64} color={Colors.tint} />
+                <Text variant="titleMedium" style={[styles.hintTitle, { color: Colors.text }]}>
+                  Search for books
                 </Text>
-                <Divider style={[styles.divider, {width: '60%'}]} />
-                <Text variant="labelMedium" style={styles.suggestionsTitle}>Try searching for:</Text>
-                <View style={styles.chipContainer}>
-                  {['Harry Potter', 'Stephen King', 'Science Fiction', 'Cooking'].map((suggestion, idx) => (
-                    <Chip 
-                      key={idx} 
-                      onPress={() => {
-                        setQuery(suggestion);
-                        setTimeout(handleSearch, 100);
-                      }}
-                      style={styles.suggestionChip}
-                    >
-                      {suggestion}
-                    </Chip>
-                  ))}
-                </View>
+                <Text variant="bodyMedium" style={[styles.hintSubtitle, { color: Colors.icon }]}>
+                  Enter a title, author, or topic to discover books
+                </Text>
               </View>
             )}
           </>
@@ -220,105 +246,82 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    elevation: 2,
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
   headerTitle: {
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   scrollContent: {
-    flexGrow: 1,
-    padding: 16,
+    paddingBottom: 24,
   },
   searchContainer: {
-    marginBottom: 16,
+    padding: 16,
   },
   searchInput: {
     marginBottom: 12,
+    backgroundColor: Colors.background,
+  },
+  searchInputOutline: {
+    borderRadius: 8,
+    borderColor: Colors.border,
   },
   searchButton: {
     borderRadius: 8,
-    paddingVertical: 6,
+    marginBottom: 16,
   },
   recentSearchesContainer: {
-    marginTop: 16,
+    marginVertical: 12,
   },
   recentSearchesTitle: {
     marginBottom: 8,
-    opacity: 0.7,
+    fontWeight: '500',
   },
   chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginVertical: 4,
   },
   recentSearchChip: {
     margin: 4,
-  },
-  suggestionChip: {
-    margin: 4,
-  },
-  resultsContainer: {
-    marginTop: 8,
-  },
-  resultsTitle: {
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  divider: {
-    marginVertical: 12,
+    backgroundColor: Colors.background,
+    borderColor: Colors.border,
+    borderWidth: 1,
   },
   loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    padding: 32,
     alignItems: 'center',
-    paddingVertical: 40,
   },
   loadingText: {
     marginTop: 12,
-    opacity: 0.7,
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
+  resultsContainer: {
+    marginTop: 8,
+    paddingHorizontal: 16,
   },
-  emptyTitle: {
-    marginTop: 16,
-    marginBottom: 8,
-    fontWeight: '500',
+  resultsTitle: {
+    fontWeight: '600',
+    marginBottom: 12,
   },
-  emptySubtitle: {
-    textAlign: 'center',
-    opacity: 0.7,
+  divider: {
+    marginBottom: 16,
+    backgroundColor: Colors.border,
   },
-  welcomeContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  welcomeTitle: {
-    marginTop: 16,
-    marginBottom: 8,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  welcomeText: {
-    textAlign: 'center',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    opacity: 0.7,
-  },
-  suggestionsTitle: {
-    marginTop: 20,
-    marginBottom: 8,
-  },
-  // BookCard styles
   bookCard: {
     borderRadius: 12,
-    marginBottom: 16,
     padding: 16,
+    marginBottom: 16,
     elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    borderWidth: 1,
   },
   bookCardHeader: {
     flexDirection: 'row',
@@ -331,20 +334,25 @@ const styles = StyleSheet.create({
   },
   bookCardTitle: {
     fontWeight: '600',
-    marginBottom: 2,
-  },
-  bookCardAuthor: {
-    opacity: 0.7,
-  },
-  bookmarkButton: {
-    margin: 0,
-    padding: 0,
+    color: Colors.text,
   },
   cardDivider: {
     marginVertical: 12,
+    backgroundColor: Colors.border,
+  },
+  bookCardAuthor: {
+    marginTop: 2,
+    color: Colors.icon,
   },
   bookCardDescription: {
     marginBottom: 16,
+    lineHeight: 20,
+    color: Colors.text,
+  },
+  bookmarkButton: {
+    margin: 0,
+    marginTop: -8,
+    marginRight: -8,
   },
   bookCardActions: {
     flexDirection: 'row',
@@ -352,6 +360,39 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   bookCardButton: {
-    minWidth: 100,
+    borderRadius: 8,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyTitle: {
+    marginTop: 16,
+    marginBottom: 8,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    textAlign: 'center',
+    marginHorizontal: 20,
+  },
+  hintContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  hintTitle: {
+    marginTop: 16,
+    marginBottom: 8,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  hintSubtitle: {
+    textAlign: 'center',
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
 });
