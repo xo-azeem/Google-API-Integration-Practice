@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-6272103758444942~4158274800"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +20,10 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.azeem70131514.BookExplorer"
+      "package": "com.azeem70131514.BookExplorer",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-6272103758444942~4158274800"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -34,7 +40,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-ads-admob"
     ],
     "experiments": {
       "typedRoutes": true

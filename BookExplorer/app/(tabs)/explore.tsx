@@ -5,10 +5,12 @@ import { ActivityIndicator, Appbar, Button, Chip, Divider, Text, TextInput, useT
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
 import { fetchBooks } from '../../services/api';
-import { registerForPushNotificationsAsync, sendPushNotification } from '../../services/notification';
+import { registerForPushNotificationsAsync, sendPushNotification } from '../../services/notifications';
+import BannerAd from '../../components/BannerAd';
+import { useInterstitialAd } from '../../components/InterstitialAd';
 
 // Improved BookCard component with MaterialCommunityIcons
-const BookCard = ({ book }) => {
+const BookCard = ({ book }: { book: any }) => {
   const [bookmarked, setBookmarked] = useState(false);
   
   const toggleBookmark = () => {
@@ -37,7 +39,10 @@ const BookCard = ({ book }) => {
           mode="text"
           onPress={toggleBookmark}
           contentStyle={styles.bookmarkButton}
-        />
+        >
+          {/* Button label */}
+          Bookmark
+        </Button>
       </View>
       <Divider style={styles.cardDivider} />
       <Text variant="bodyMedium" numberOfLines={3} style={styles.bookCardDescription}>
@@ -72,8 +77,10 @@ export default function ExploreScreen() {
   const [query, setQuery] = useState('');
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [recentSearches, setRecentSearches] = useState([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [searchCount, setSearchCount] = useState(0); // Track search count for interstitial ads
   const theme = useTheme();
+  const { showAd } = useInterstitialAd();
 
   useEffect(() => {
     registerForPushNotificationsAsync();
@@ -94,6 +101,15 @@ export default function ExploreScreen() {
       }
       
       sendPushNotification('Search complete!', `Found ${results.length} books related to "${query}"`);
+      
+      // Increment search count
+      const newSearchCount = searchCount + 1;
+      setSearchCount(newSearchCount);
+      
+      // Show interstitial ad every 3 searches
+      if (newSearchCount % 3 === 0) {
+        await showAd();
+      }
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -101,7 +117,7 @@ export default function ExploreScreen() {
     }
   };
 
-  const handleRecentSearch = (searchTerm) => {
+  const handleRecentSearch = (searchTerm: string) => {
     setQuery(searchTerm);
     setTimeout(() => {
       handleSearch();
@@ -236,6 +252,11 @@ export default function ExploreScreen() {
             )}
           </>
         )}
+        
+        {/* Add banner ad at the bottom */}
+        <View style={styles.adContainer}>
+          <BannerAd />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -394,5 +415,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginHorizontal: 20,
     marginBottom: 20,
+  },
+  adContainer: {
+    marginTop: 20,
+    marginBottom: 10,
+    width: '100%',
   },
 });

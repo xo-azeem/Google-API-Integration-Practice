@@ -5,6 +5,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Colors } from '../../constants/Colors';
+import BannerAd from '../../components/BannerAd';
+
+// Get the correct type for MaterialCommunityIcons name
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 export default function HomeScreen() {
     const theme = useTheme();
@@ -43,19 +47,31 @@ export default function HomeScreen() {
                 <Button 
                     mode="contained" 
                     onPress={() => router.push('/(tabs)/explore')}
-                    icon="arrow-right"
+                    icon={({size, color}) => (
+                        <MaterialCommunityIcons name="arrow-right" size={size} color={color} />
+                    )}
                     contentStyle={styles.buttonContent}
                     style={styles.button}
                     labelStyle={styles.buttonLabel}
                 >
                     Start Exploring
                 </Button>
+                
+                <View style={styles.adContainer}>
+                    <BannerAd />
+                </View>
             </View>
         </SafeAreaView>
     );
 }
 
-function FeatureItem({ icon, title, description }) {
+interface FeatureItemProps {
+    icon: IconName;
+    title: string;
+    description: string;
+}
+
+function FeatureItem({ icon, title, description }: FeatureItemProps) {
     return (
         <View style={styles.featureItem}>
             <View style={[styles.iconContainer, { backgroundColor: Colors.tint + '15' }]}>
@@ -158,5 +174,9 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginLeft: 8,
         color: '#fff',
+    },
+    adContainer: {
+        marginTop: 30,
+        width: '100%',
     },
 });
